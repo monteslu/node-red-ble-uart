@@ -1,6 +1,6 @@
 {
   "name": "@hsync/node-red-ble-uart",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Turn your node-red instance into a simple BLE UART device",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,18 @@
       "ble-uart": "ble-uart.js"
     }
   },
-  "keywords": [],
+  "keywords": [
+    "node-red",
+    "bluetooth",
+    "nordic",
+    "serial",
+    "uart",
+    "ble",
+    "peripheral",
+    "bluetooth low energy",
+    "bleno",
+    "noble"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
