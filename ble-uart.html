@@ -1,0 +1,51 @@
+<script type="text/javascript">
+  RED.nodes.registerType('uart-in',{
+    category: 'network',
+    color: 'rgb(0, 144, 212)',
+    defaults: {
+      name: {value:""},
+    },
+    inputs:0,
+    outputs:1,
+    icon: "bluetooth.png",
+    label: function() {
+      return this.name || "uart-in";
+    }
+  });
+</script>
+<script type="text/html" data-template-name="uart-in">
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+
+<script type="text/html" data-help-name="uart-in">
+  <p>Emits BLE serial messages sent to the local peripheral.</p>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType('uart-notify',{
+    category: 'network',
+    color: 'rgb(0, 144, 212)',
+    defaults: {
+      name: {value:""},
+    },
+    inputs:1,
+    outputs:0,
+    align: "right",
+    icon: "bluetooth.png",
+    label: function() {
+      return this.name || 'uart-notify';
+    }
+  });
+</script>
+<script type="text/html" data-template-name="uart-notify">
+  <div class="form-row">
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+<script type="text/html" data-help-name="uart-notify">
+  <p>Sends BLE serial messages to the connected BLE client.</p>
+</script>

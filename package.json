@@ -1,0 +1,21 @@
+{
+  "name": "@hsync/node-red-ble-uart",
+  "version": "0.1.0",
+  "description": "Turn your node-red instance into a simple BLE UART device",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "node-red": {
+    "version": ">=2.0.0",
+    "nodes": {
+      "ble-uart": "ble-uart.js"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@abandonware/bleno": "^0.6.1"
+  }
+}
