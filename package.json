@@ -1,6 +1,6 @@
 {
   "name": "@hsync/node-red-ble-uart",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Turn your node-red instance into a simple BLE UART device",
   "main": "index.js",
   "scripts": {

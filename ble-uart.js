@@ -4,31 +4,34 @@ const bleno = require('@abandonware/bleno');
 const getCharacteristics = require('./characteristics');
 
 module.exports = function(RED) {
+  const DEFAULT_SERIAL_SERVICE = '6e400001b5a3f393e0a9e50e24dcca9e';
   const { RxCharacteristic, TxCharacteristic } = getCharacteristics(bleno);
   const rx = new RxCharacteristic();
   const tx = new TxCharacteristic();
   let status = 'opening';
   const name = os.hostname();
 
-  const DEFAULT_SERIAL_SERVICE = '6e400001b5a3f393e0a9e50e24dcca9e';
-
   const serviceUuids = [DEFAULT_SERIAL_SERVICE];
-
-  bleno.on('stateChange', (state) => {
-    // console.log('on -> stateChange: ' + state);
-    if (state === 'poweredOn') {
-      bleno.startAdvertising(name, serviceUuids, (error) => {
-        if (error) {
-          console.log(error);
-        } else {
-          // console.log('started advertising');
-          status = 'advertising';
-        } 
-      });
-    } else {
-      bleno.stopAdvertising();
-    }
-  });
+  try {
+    bleno.on('stateChange', (state) => {
+      console.log('on -> stateChange: ' + state);
+      if (state === 'poweredOn') {
+        bleno.startAdvertising(name, serviceUuids, (error) => {
+          if (error) {
+            console.log(error);
+          } else {
+            // console.log('started advertising');
+            status = 'advertising';
+          } 
+        });
+      } else {
+        bleno.stopAdvertising();
+      }
+    });
+  } catch (e) {
+    console.error(e);
+  }
+  
 
   bleno.on('disconnect', (clientAddress) => {
     // console.log('on -> disconnect: ' + clientAddress);
@@ -112,6 +115,8 @@ module.exports = function(RED) {
   function BLEIn(config) {
     RED.nodes.createNode(this, config);
     const node = this;
+    console.log('blein config', config);
+    node.emit_type = config.emit_type || 'string';
 
     if (status === 'opening' || status === 'disconnected') {
       node.status({fill:'yellow',shape:'ring',text: status});
@@ -122,12 +127,18 @@ module.exports = function(RED) {
     }
 
     const onWrite = (data, offset, withoutResponse, callback) => {
+      let payload = data;
+      if (node.emit_type === 'string') {
+        payload = data.toString('utf8');
+      } else if (node.emit_type === 'hex') {
+        payload = data.toString('hex');
+      }
       // const value = data.toString('utf8');
       // console.log('rx write', value);
       // const resp = Buffer.from(value + ' back atcha ' + Date.now());
       // tx.send(resp);
       node.send({
-        payload: data,
+        payload,
         topic: 'uart-in',
       });
     };

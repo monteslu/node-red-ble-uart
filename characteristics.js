@@ -1,7 +1,7 @@
 const { EventEmitter } = require('events');
 
-const DEFAULT_TRANSMIT_CHARACTERISTIC = '6e400002b5a3f393e0a9e50e24dcca9e';
-const DEFAULT_RECEIVE_CHARACTERISTIC =  '6e400003b5a3f393e0a9e50e24dcca9e';
+const DEFAULT_RECEIVE_CHARACTERISTIC =  '6e400002b5a3f393e0a9e50e24dcca9e';
+const DEFAULT_TRANSMIT_CHARACTERISTIC = '6e400003b5a3f393e0a9e50e24dcca9e';
 
 function getCharacteristics(bleno) {
   class RxCharacteristic extends bleno.Characteristic {

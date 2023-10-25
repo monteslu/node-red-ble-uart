@@ -4,12 +4,20 @@
     color: 'rgb(0, 144, 212)',
     defaults: {
       name: {value:""},
+      output_type: {value:"string"}
     },
     inputs:0,
     outputs:1,
     icon: "bluetooth.png",
     label: function() {
       return this.name || "uart-in";
+    },
+    oneditprepare: function() {
+      $("#node-input-output_type").change(function() {
+        const a = $("#node-input-output_type").val();
+        console.log('ble output output_type', a);
+      });
+      $("#node-input-output_type").change();
     }
   });
 </script>
@@ -18,6 +26,14 @@
       <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
       <input type="text" id="node-input-name" placeholder="Name">
   </div>
+  <div class="form-row">
+    <label for="node-input-output_type"><i class="fa fa-tag"></i> output type</label>
+    <select id="node-input-output_type" style="width:60%; margin-right:5px;">
+        <option value="string">String</option>
+        <option value="buffer">Buffer</option>
+        <option value="hex">Hex</option>
+    </select>
+</div>
 </script>
 
 <script type="text/html" data-help-name="uart-in">
