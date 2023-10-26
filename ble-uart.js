@@ -28,6 +28,10 @@ module.exports = function(RED) {
         bleno.stopAdvertising();
       }
     });
+
+    bleno.on('error', (error) => {
+      console.log('bleno error: ' + error);
+    });
   } catch (e) {
     console.error(e);
   }
@@ -61,13 +65,59 @@ module.exports = function(RED) {
     }
   });
 
-  
+  function BLEIn(config) {
+    RED.nodes.createNode(this, config);
+    const node = this;
+    console.log('blein config', config);
+    node.emit_type = config.emit_type || 'string';
+
+    if (status === 'opening' || status === 'disconnected' || status === 'advertising') {
+      node.status({fill:'yellow',shape:'ring',text: status});
+    }
+
+    if (status === 'connected') {
+      node.status({fill:'green',shape:'dot',text: status});
+    }
+
+    const onWrite = (data, offset, withoutResponse, callback) => {
+      let payload = data;
+      if (node.emit_type === 'string') {
+        payload = data.toString('utf8');
+      } else if (node.emit_type === 'hex') {
+        payload = data.toString('hex');
+      }
+      node.send({
+        payload,
+        topic: 'uart-in',
+      });
+    };
+
+    rx.events.on('write', onWrite);
+
+    const onAccept = () => {
+      node.status({fill:'green',shape:'dot',text: 'connected'});
+    };
+
+    const onDisconnect = () => {
+      node.status({fill:'yellow',shape:'ring',text: 'advertising'});
+    };
+
+    bleno.on('accept', onAccept);
+    bleno.on('disconnect', onDisconnect);
+
+    node.on('close', () => {
+      bleno.removeListener('accept', onAccept);
+      bleno.removeListener('disconnect', onDisconnect);
+      rx.events.removeListener('write', onWrite);
+    });
+  }
+  RED.nodes.registerType('uart-in', BLEIn);
 
   function BLENotify(config) {
     RED.nodes.createNode(this, config);
     const node = this;
     
-    if (status === 'opening' || status === 'disconnected') {
+    if (status === 'opening' || status === 'disconnected' || status === 'advertising') {
       node.status({fill:'yellow',shape:'ring',text: status});
     }
 
@@ -95,7 +145,7 @@ module.exports = function(RED) {
     };
 
     const onDisconnect = () => {
-      node.status({fill:'yellow',shape:'ring',text: 'disconnected'});
+      node.status({fill:'yellow',shape:'ring',text: 'advertising'});
     };
 
     bleno.on('accept', onAccept);
@@ -104,64 +154,8 @@ module.exports = function(RED) {
     node.on('close', () => {
       bleno.removeListener('accept', onAccept);
       bleno.removeListener('disconnect', onDisconnect);
-      rx.events.removeListener('write', onWrite);
     });
-
-
   }
   RED.nodes.registerType('uart-notify', BLENotify);
-
-
-  function BLEIn(config) {
-    RED.nodes.createNode(this, config);
-    const node = this;
-    console.log('blein config', config);
-    node.emit_type = config.emit_type || 'string';
-
-    if (status === 'opening' || status === 'disconnected') {
-      node.status({fill:'yellow',shape:'ring',text: status});
-    }
-
-    if (status === 'connected') {
-      node.status({fill:'green',shape:'dot',text: status});
-    }
-
-    const onWrite = (data, offset, withoutResponse, callback) => {
-      let payload = data;
-      if (node.emit_type === 'string') {
-        payload = data.toString('utf8');
-      } else if (node.emit_type === 'hex') {
-        payload = data.toString('hex');
-      }
-      // const value = data.toString('utf8');
-      // console.log('rx write', value);
-      // const resp = Buffer.from(value + ' back atcha ' + Date.now());
-      // tx.send(resp);
-      node.send({
-        payload,
-        topic: 'uart-in',
-      });
-    };
-
-    rx.events.on('write', onWrite);
-
-    const onAccept = () => {
-      node.status({fill:'green',shape:'dot',text: 'connected'});
-    };
-
-    const onDisconnect = () => {
-      node.status({fill:'yellow',shape:'ring',text: 'disconnected'});
-    };
-
-    bleno.on('accept', onAccept);
-    bleno.on('disconnect', onDisconnect);
-
-    node.on('close', () => {
-      bleno.removeListener('accept', onAccept);
-      bleno.removeListener('disconnect', onDisconnect);
-      rx.events.removeListener('write', onWrite);
-    });
-  }
-  RED.nodes.registerType('uart-in', BLEIn);
 
 }
